@@ -102,32 +102,27 @@
 
 
 const request = require('supertest');
-const app = require('../app'); // adjust this path to match your project structure
+const mongoose = require('mongoose');
+const { app, server } = require('../app');
+const User = require('../models/userModel');
 
-let server;
+const testUser = { username: 'testuser', password: 'testpass' };
 let token;
 
-beforeAll((done) => {
-  server = app.listen(4000, () => {
-    console.log('Test server running on port 4000');
-    done();
-  });
-}, 10000);
-
-afterAll((done) => {
-  server.close(done);
-});
-
-// Random user to prevent conflicts
-const testUser = {
-  username: `user_${Date.now()}`,
-  password: 'testpass123'
-};
-
 describe('User API', () => {
+  beforeAll(async () => {
+    await mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost/testdb');
+    await User.deleteMany({});
+  });
+
+  afterAll(async () => {
+    await mongoose.disconnect();
+    server.close();
+  });
+
   it('should register a new user', async () => {
     const res = await request(app).post('/api/register').send(testUser);
-    expect(res.statusCode).toBe(201); // or 200 depending on your app
+    expect(res.statusCode).toBe(201);
     expect(res.body.message).toBeDefined();
   }, 10000);
 
@@ -159,67 +154,3 @@ describe('User API', () => {
     expect(res.statusCode).toBe(401);
   }, 10000);
 });
-
-
-
-
-// const request = require('supertest');
-// const app = require('../app');
-// const db = require('../config');
-
-// let token = '';
-
-// beforeAll(done => {
-//   // Clear and setup test user
-//   db.query('DELETE FROM users WHERE username = ?', ['testuser'], () => {
-//     done();
-//   });
-// });
-
-// afterAll(() => {
-//   db.end(); // Close DB connection after tests
-// });
-
-// describe('User API', () => {
-//   it('should register a new user', async () => {
-//     const res = await request(app).post('/api/register').send({
-//       username: 'testuser',
-//       password: 'testpass'
-//     });
-//     expect(res.statusCode).toEqual(201);
-//     expect(res.body.message).toBe('User registered');
-//   });
-
-//   it('should login and return token', async () => {
-//     const res = await request(app).post('/api/login').send({
-//       username: 'testuser',
-//       password: 'testpass'
-//     });
-//     expect(res.statusCode).toEqual(200);
-//     expect(res.body.token).toBeDefined();
-//     token = res.body.token;
-//   });
-
-//   it('should fetch profile with token', async () => {
-//     const res = await request(app)
-//       .get('/api/profile')
-//       .set('Authorization', `Bearer ${token}`);
-//     expect(res.statusCode).toEqual(200);
-//     expect(res.body.username).toBe('testuser');
-//   });
-
-//   it('should reject access without token', async () => {
-//     const res = await request(app).get('/api/profile');
-//     expect(res.statusCode).toEqual(401);
-//   });
-
-//   it('should reject wrong login', async () => {
-//     const res = await request(app).post('/api/login').send({
-//       username: 'testuser',
-//       password: 'wrongpass'
-//     });
-//     expect(res.statusCode).toEqual(401);
-//   });
-// });
-
-// push
