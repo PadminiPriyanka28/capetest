@@ -106,20 +106,28 @@ const mongoose = require('mongoose');
 const { app, server } = require('../app');
 const User = require('../models/userModel');
 
-const testUser = { username: 'testuser', password: 'testpass' };
+const testUser = {
+  username: 'testuser123',
+  email: 'testuser123@example.com',
+  password: 'testpassword'
+};
+
 let token;
 
+beforeAll(async () => {
+  await mongoose.connect('mongodb://localhost:27017/testdb', {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+  });
+});
+
+afterAll(async () => {
+  await User.deleteMany({ username: testUser.username });
+  await mongoose.connection.close();
+  server.close();
+});
+
 describe('User API', () => {
-  beforeAll(async () => {
-    await mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost/testdb');
-    await User.deleteMany({});
-  });
-
-  afterAll(async () => {
-    await mongoose.disconnect();
-    server.close();
-  });
-
   it('should register a new user', async () => {
     const res = await request(app).post('/api/register').send(testUser);
     expect(res.statusCode).toBe(201);
