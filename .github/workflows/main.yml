@@ -55,6 +55,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+        # Install supertest for the tests
+      - name: Install supertest
+        run: npm install supertest --save-dev
+        working-directory: ./backend
+
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
