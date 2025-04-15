@@ -70,6 +70,12 @@ jobs:
       - name: Install backend dependencies
         run: npm ci
         working-directory: ./backend
+        
+      - name: Install dependencies
+        run: npm install
+             npm install jsonwebtoken --save  # Install jsonwebtoken as a dependency
+
+        
 
       - name: Run backend tests
         env:
