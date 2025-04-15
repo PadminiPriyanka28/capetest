@@ -333,7 +333,7 @@ app.delete('/api/users/:id', authenticateUser, async (req, res) => {
 app.use(express.static(path.join(__dirname, 'public')));
 
 // API routes
-app.use('/api', require('./routes'));
+app.use('/api', require('./routes/userRoutes'));
 
 // The "catchall" handler: for any request that doesn't
 // match one above, send back React's index.html file.
