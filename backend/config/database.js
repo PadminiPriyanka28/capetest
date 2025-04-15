@@ -15,6 +15,7 @@ const config = {
     database: process.env.DB_NAME_TEST || 'user_management_test',
     host: process.env.DB_HOST,
     dialect: 'mysql'
+    charset: 'utf8mb4' 
   }
 };
 
